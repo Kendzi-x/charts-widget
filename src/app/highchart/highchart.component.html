@@ -1,0 +1,31 @@
+<div class="graph">
+  <button type="button" class="btn btn-dark" (click)="toggleSeriesType()">Toggle type</button>
+  <div class="btn-group" dropdown>
+    <button type="button" class="btn btn-dark dropdown-toggle" dropdownToggle aria-controls="dropdown-basic">Choose color </button>
+    <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+      <li role="menuitem"><a class="dropdown-item" (click)="toggleSeriesColor($event)">orange</a></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="toggleSeriesColor($event)">purple</a></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="toggleSeriesColor($event)">pink</a></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="toggleSeriesColor($event)">olive</a></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="toggleSeriesColor($event)">teal</a></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="toggleSeriesColor($event)">fuchsia</a></li>
+        <li class="divider dropdown-divider"></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="toggleSeriesColor($event)">default</a></li>
+    </ul>
+  </div>
+  <div class="btn-group" dropdown>
+    <button type="button" class="btn btn-dark dropdown-toggle" dropdownToggle aria-controls="dropdown-basic">Select sensors </button>
+    <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+      <li role="menuitem"><a class="dropdown-item" (click)="selectSensors($event)">temperature</a></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="selectSensors($event)">humidity</a></li>
+      <li role="menuitem"><a class="dropdown-item" (click)="selectSensors($event)">light</a></li>
+    </ul>
+  </div>
+  <highcharts-chart
+    [Highcharts]="highcharts"
+    [options]="chartOptions"
+    [(update)]="updateChart"
+    [oneToOne]=true
+    style="height: 350px; display: block;"
+  ></highcharts-chart>
+</div>

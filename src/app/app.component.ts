@@ -6,5 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'test-widgets';
+  public isShown: boolean = true;
+  public numberOfCharts: number = 1;
+  public dateRange: string[];
 }

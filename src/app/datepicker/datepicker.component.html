@@ -1,0 +1,12 @@
+<div class="inner-addon right-addon">
+  <i class="fa fa-calendar"></i>
+  <input
+    type="text"
+    placeholder="Choose a daterange"
+    class="form-control"
+    bsDaterangepicker
+    [(ngModel)]="model"
+    (ngModelChange)="change()"
+    [bsConfig]="{ containerClass: 'theme-default', rangeInputFormat: 'DD.MM.YYYY' }"
+  />
+</div>
