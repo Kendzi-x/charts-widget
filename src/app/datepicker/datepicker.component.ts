@@ -39,7 +39,7 @@ export class DatepickerComponent implements OnInit {
     this.datepicker.hide();
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     const week = new Date();
     week.setDate(week.getDate() + 7);
     this.model = [new Date(), week]; // initial state

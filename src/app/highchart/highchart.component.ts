@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import DarkUnicaTheme from 'highcharts/themes/dark-unica';
 DarkUnicaTheme(Highcharts);
@@ -7,8 +7,8 @@ import { sensorsData } from '../common/mock/data';
 
 export interface ISeries {
   name: string;
-  data: number[];
-  color: string;
+  data?: number[];
+  color?: string;
 }
 
 Highcharts.setOptions({
@@ -37,11 +37,17 @@ export class HighchartComponent implements OnChanges {
   public highcharts: typeof Highcharts = Highcharts;
   public chartOptions;
 
+  /* Chart config */
   public currentType: string = 'line';
+  public chartData: ISeries[] = [
+    {
+      name: 'temperature',
+      data: sensorsData(8),
+      color: '#2b908f'
+    }
+  ];
 
-  public dataOfSensors: number[] = sensorsData(8);
-
-  seriesTypes: { [key: string]: string } = {
+  public seriesTypes: { [key: string]: string } = {
     'line': 'bar',
     'bar': 'line'
   };
@@ -56,6 +62,16 @@ export class HighchartComponent implements OnChanges {
     return d;
   }
 
+  public newDataOfSensors(dataOfSensors: number[]): number[] {
+    const diff = this.xs.length - dataOfSensors.length;
+    if (diff > 0) {
+      dataOfSensors = dataOfSensors.concat(sensorsData(diff)); // add values for new larger period
+    } else if (diff < 0) {
+      dataOfSensors.splice(diff, Math.abs(diff)); // remove extra values
+    }
+    return dataOfSensors;
+  }
+
   public ngOnChanges(): void {
     const arr = [],
       startDate = new Date(this.formattedDate(this.dateRange[0])),
@@ -66,19 +82,15 @@ export class HighchartComponent implements OnChanges {
       startDate.setDate(startDate.getDate() + 1);
     }
 
-    this.xs = arr.map((date: Date) => formatDate(date));
+    this.xs = arr.map((date: Date) => formatDate(date)); // xAxis
 
-    const diff = this.xs.length - this.dataOfSensors.length;
-    if (diff > 0) {
-      this.dataOfSensors = this.dataOfSensors.concat(sensorsData(diff)); // add values for new larger period
-    } else {
-      this.dataOfSensors = sensorsData(this.xs.length);
-    }
+    this.chartData.map((val: ISeries) => (val.data = this.newDataOfSensors(val.data)));
 
     /* Options */
     this.chartOptions = {
+      title: { text: 'Sensors chart' },
       chart: {
-        type: this.currentType
+        type: this.currentType // line | bar
       },
       xAxis: {
         type: 'datetime',
@@ -93,13 +105,7 @@ export class HighchartComponent implements OnChanges {
           overflow: 'justify'
         }
       },
-      series: [
-        {
-          name: 'temperature',
-          data: this.dataOfSensors,
-          color: '#2b908f'
-        }
-      ]
+      series: this.chartData
     };
 
     this.updateChart = true;
@@ -107,8 +113,6 @@ export class HighchartComponent implements OnChanges {
 
   public toggleSeriesType(): void {
     this.chartOptions.chart.type = this.seriesTypes[ this.chartOptions.chart.type || 'line' ] as 'line' | 'bar';
-    console.log(this.chartOptions.chart.type);
-
     this.currentType = this.chartOptions.chart.type;
 
     // nested change - must trigger update
@@ -135,26 +139,32 @@ export class HighchartComponent implements OnChanges {
 
   public selectSensors({ target }): void {
     if (target.text === 'temperature') {
-      console.log('temperature');
-      this.chartOptions.series.map((val: ISeries) => {
-        val.color = '#2b908f';
-        val.name = 'temperature';
-      });
+      this.chartData[0].name = 'temperature';
+      this.chartData[0].color = '#2b908f';
     } else if (target.text === 'humidity')  {
-      console.log('humidity');
-      this.chartOptions.series.map((val: ISeries) => {
-        val.color = 'blue';
-        val.name = 'humidity';
-      });
+      this.chartData[0].name = 'humidity';
+      this.chartData[0].color = 'blue';
     } else {
-      console.log('light');
-      this.chartOptions.series.map((val: ISeries) => {
-        val.color = 'yellow';
-        val.name = 'light';
+      this.chartData[0].name = 'light';
+      this.chartData[0].color = 'yellow';
+    }
+
+    this.chartData[0].data = sensorsData(this.xs.length);
+    this.updateChart = true;
+  }
+
+  public combineSensors() {
+    if (this.chartData.length < 3) {
+      this.chartData.push( {
+        name: '2nd temperature',
+        data: sensorsData(this.xs.length)
+      },
+      {
+        name: 'humidity',
+        data: sensorsData(this.xs.length)
       });
     }
 
-    this.chartOptions.series.map((val: ISeries) => (val.data = sensorsData(this.xs.length)));
     this.updateChart = true;
   }
 }
